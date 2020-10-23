@@ -1,0 +1,38 @@
+{
+  "name": "@tawaship/canvas-recorder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "rollup": "rollup -c rollup.config.js",
+    "d": "tsc --target ES5 --emitDeclarationOnly --downlevelIteration --outDir types/ --declaration",
+    "docs": "typedoc --tsconfig tsconfig.json",
+    "watch": "npm run rollup -- -w",
+    "build": "node del.js && npm run rollup && npm run docs && npm run d && echo done."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tawaship/CanvasRecorder.git"
+  },
+  "author": "tawaship",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tawaship/CanvasRecorder/issues"
+  },
+  "homepage": "https://github.com/tawaship/CanvasRecorder#readme",
+  "devDependencies": {
+    "@rollup/plugin-buble": "^0.21.3",
+    "@rollup/plugin-commonjs": "^11.0.2",
+    "@rollup/plugin-node-resolve": "^7.1.1",
+    "@rollup/plugin-typescript": "^5.0.2",
+    "del": "^5.1.0",
+    "rollup": "^2.32.1",
+    "rollup-plugin-terser": "^7.0.0",
+    "tslib": "^1.11.0",
+    "typedoc": "^0.18.0",
+    "typescript": "^3.8.2"
+  },
+  "dependencies": {
+    "@tawaship/emitter": "^3.0.0"
+  }
+}

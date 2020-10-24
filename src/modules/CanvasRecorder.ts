@@ -246,7 +246,7 @@ export class CanvasRecorder {
 			})
 			.then(() => {
 				if (!AudioContext) {
-					console.warn('[CanvasRecorder] Priority is given to hdisplay mediah as multiple audio tracks cannot be used.');
+					console.warn('[CanvasRecorder] Priority is given to "display media" as multiple audio tracks cannot be used.');
 					streams.forEach(stream => stream.getAudioTracks().forEach(track => this._recorder.stream.addTrack(track)));
 					return;
 				}

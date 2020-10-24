@@ -171,7 +171,7 @@ var CanvasRecorder = function() {
             console.warn("[CanvasRecorder] Can not use user media.");
         })).then((function() {
             if (!AudioContext) {
-                return console.warn("[CanvasRecorder] Priority is given to �hdisplay media�h as multiple audio tracks cannot be used."), 
+                return console.warn('[CanvasRecorder] Priority is given to "display media" as multiple audio tracks cannot be used.'), 
                 void streams.forEach((function(stream) {
                     return stream.getAudioTracks().forEach((function(track) {
                         return this$1._recorder.stream.addTrack(track);

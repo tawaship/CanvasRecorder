@@ -49,7 +49,7 @@
 					setTimeout(() => {
 						recorder.finishAsync()
 							.then(movie => {
-								movie.download();
+								movie.download(tag);
 							});
 					}, 2000);
 				}));

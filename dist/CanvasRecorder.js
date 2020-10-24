@@ -92,24 +92,20 @@ var CanvasRecorder = function() {
         }
         var video = document.createElement("video");
         return video.src = this._blobURL, video.setAttribute("controls", ""), video;
-    }, Movie.prototype.download = function() {
+    }, Movie.prototype.download = function(filename) {
         if (!this._blobURL) {
             throw new Error("[CanvasRecorder] This movie instance was destroyed.");
         }
         var anchor = document.createElement("a");
-        anchor.download = location.hostname + "_" + (new Date).toLocaleString().replace(/[\/\s\:]/g, "-") + ".webm", 
+        anchor.download = filename ? filename + ".webm" : location.hostname + "_" + (new Date).toLocaleString().replace(/[\/\s\:]/g, "-") + ".webm", 
         anchor.href = this._blobURL, anchor.click();
     }, Movie.prototype.destroy = function() {
         window.URL.revokeObjectURL(this._blobURL), this._blobURL = null;
     };
-    var CanvasRecorder = function(canvas, recordOptions) {
+    var CanvasRecorder = function(stream, recordOptions) {
         var this$1 = this;
         void 0 === recordOptions && (recordOptions = {}), this._buildPromise = null, this._buildEmitter = new Emitter, 
         this._movie = null;
-        var stream = new MediaStream;
-        canvas.captureStream().getVideoTracks().forEach((function(track) {
-            stream.addTrack(track);
-        }));
         var blobList = [];
         this._recorder = new MediaRecorder(stream, recordOptions), this._recorder.addEventListener("dataavailable", (function(e) {
             blobList.push(e.data);
@@ -134,34 +130,72 @@ var CanvasRecorder = function() {
         "recording" === this._recorder.state && this._recorder.pause();
     }, CanvasRecorder.prototype.resume = function() {
         "paused" === this._recorder.state && this._recorder.resume();
+    }, CanvasRecorder.prototype.destroy = function() {
+        this._movie && (this._movie.destroy(), this._movie = null);
     }, CanvasRecorder.prototype.addAudioAsync = function(audioOptions) {
         var this$1 = this;
-        return void 0 === audioOptions && (audioOptions = {
+        void 0 === audioOptions && (audioOptions = {
             display: !0
-        }), Promise.resolve().then((function() {
+        });
+        var streams = [];
+        return Promise.resolve().then((function() {
+            if (!audioOptions.display) {
+                return Promise.resolve();
+            }
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+                return Promise.reject();
+            }
+            var displayTrackConstraints = !0 === audioOptions.display ? defaultUserAudioTrackConstraints : audioOptions.display;
+            return navigator.mediaDevices.getDisplayMedia({
+                audio: displayTrackConstraints,
+                video: !0
+            }).then((function(displayStream) {
+                return streams.push(displayStream);
+            }));
+        })).catch((function(e) {
+            console.warn("[CanvasRecorder] Can not use display media.");
+        })).then((function() {
             if (!audioOptions.user) {
                 return Promise.resolve();
+            }
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                return Promise.reject();
             }
             var userTrackConstraints = !0 === audioOptions.user ? defaultUserAudioTrackConstraints : audioOptions.user;
             return navigator.mediaDevices.getUserMedia({
                 audio: userTrackConstraints
             }).then((function(userStream) {
-                userStream.getAudioTracks().forEach((function(track) {
-                    this$1._recorder.stream.addTrack(track);
-                }));
+                return streams.push(userStream);
             }));
+        })).catch((function(e) {
+            console.warn("[CanvasRecorder] Can not use user media.");
         })).then((function() {
-            if (!audioOptions.display) {
-                return Promise.resolve();
-            }
-            var displayTrackConstraints = !0 === audioOptions.display ? defaultUserAudioTrackConstraints : audioOptions.display;
-            return navigator.mediaDevices.getDisplayMedia({
-                audio: displayTrackConstraints
-            }).then((function(displayStream) {
-                displayStream.getAudioTracks().forEach((function(track) {
-                    this$1._recorder.stream.addTrack(track);
+            if (!AudioContext) {
+                return console.warn("[CanvasRecorder] Priority is given to �hdisplay media�h as multiple audio tracks cannot be used."), 
+                void streams.forEach((function(stream) {
+                    return stream.getAudioTracks().forEach((function(track) {
+                        return this$1._recorder.stream.addTrack(track);
+                    }));
                 }));
-            }));
+            }
+            var audioContext = new AudioContext, destination = audioContext.createMediaStreamDestination();
+            streams.forEach((function(stream) {
+                return audioContext.createMediaStreamSource(stream).connect(destination);
+            })), this$1._recorder.stream.addTrack(destination.stream.getAudioTracks()[0]);
+        }));
+    }, CanvasRecorder.create = function(canvas, recordOptions) {
+        void 0 === recordOptions && (recordOptions = {});
+        var stream = new MediaStream;
+        return canvas.captureStream().getVideoTracks().forEach((function(track) {
+            stream.addTrack(track);
+        })), new CanvasRecorder(stream, recordOptions);
+    }, CanvasRecorder.createWithAudioAsync = function(canvas, audioOptions, recordOptions) {
+        void 0 === audioOptions && (audioOptions = {
+            display: !0
+        }), void 0 === recordOptions && (recordOptions = {});
+        var recorder = CanvasRecorder.create(canvas, recordOptions);
+        return recorder.addAudioAsync(audioOptions).then((function() {
+            return recorder;
         }));
     }, CanvasRecorder;
 }();

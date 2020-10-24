@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no, minimal-ui">
+		<script src="pixi.5.3.2.min.js"></script>
+		<script src="../dist/CanvasRecorder.js"></script>
+	</head>
+	<body>
+		<canvas></canvas><br />
+		<script>
+			const app = new PIXI.Application({
+				view: document.getElementsByTagName('canvas')[0],
+				width: 300,
+				height: 200
+			});
+			
+			{
+				const sprite = app.stage.addChild(new PIXI.Sprite(PIXI.Texture.WHITE));
+				app.start();
+				sprite.y = 20;
+				const y = 300 - sprite.width;
+				let d = 1;
+				app.ticker.add(e => {
+					sprite.x += 1 * d;
+					if (sprite.x > y) {
+						d = -1;
+					} else if (sprite.x < 0) {
+						d = 1;
+					}
+				});
+				app.render();
+			}
+			
+			function createButton(tag, callback) {
+				const button = document.createElement('button');
+				button.textContent = tag;
+				button.style.display = 'block';
+				button.style.marginBottom = '10px';
+				button.addEventListener('click', callback);
+				
+				return button;
+			}
+			
+			{	const tag = 'create';
+				document.body.appendChild(createButton(tag, () => {
+					const recorder = CanvasRecorder.create(app.view);
+					recorder.start();
+					setTimeout(() => {
+						recorder.finishAsync()
+							.then(movie => {
+								movie.download();
+							});
+					}, 2000);
+				}));
+			}
+			
+			{
+				const tag = 'create with display media';
+				document.body.appendChild(createButton(tag, () => {
+					CanvasRecorder.createWithAudioAsync(app.view)
+						.then(recorder => {
+							recorder.start();
+							setTimeout(() => {
+								recorder.finishAsync()
+									.then(movie => {
+										movie.download(tag);
+									});
+							}, 2000);
+						});
+				}));
+			}
+			
+			{
+				const tag = 'create with user media';
+				document.body.appendChild(createButton(tag, () => {
+					CanvasRecorder.createWithAudioAsync(app.view, { user: true })
+						.then(recorder => {
+							recorder.start();
+							setTimeout(() => {
+								recorder.finishAsync()
+									.then(movie => {
+										movie.download(tag);
+									});
+							}, 2000);
+						});
+				}));
+			}
+			
+			{
+				const tag = 'create with display and user media';
+				document.body.appendChild(createButton(tag, () => {
+					CanvasRecorder.createWithAudioAsync(app.view, { user: true, display: true  })
+						.then(recorder => {
+							recorder.start();
+							setTimeout(() => {
+								recorder.finishAsync()
+									.then(movie => {
+										movie.download(tag);
+									});
+							}, 2000);
+						});
+				}));
+			}
+			
+			{
+				const tag = 'create from stream';
+				
+				document.body.appendChild(createButton(tag, () => {
+					const stream = new MediaStream();
+					app.view.captureStream().getVideoTracks().forEach(track => stream.addTrack(track));
+					
+					navigator.mediaDevices.getDisplayMedia({ audio: { channelCount: 2 }, video: true })
+						.then(audioStream => audioStream.getAudioTracks().forEach(track => stream.addTrack(track)))
+						.then(() => {
+							const recorder = new CanvasRecorder(stream);
+							recorder.start();
+							
+							setTimeout(() => {
+								recorder.finishAsync()
+									.then(movie => {
+										movie.download(tag);
+									});
+							}, 2000);
+						});
+				}));
+			}
+		</script>
+	</body>
+</html>

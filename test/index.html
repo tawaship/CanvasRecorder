@@ -42,16 +42,22 @@
 				return button;
 			}
 			
-			{	const tag = 'create';
+			function record(recorder, tag, time) {
+				recorder.start();
+				setTimeout(() => {
+					recorder.finishAsync()
+						.then(movie => {
+							movie.download(tag);
+							recorder.destroy();
+						});
+				}, time);
+			}
+			
+			{
+				const tag = 'create';
 				document.body.appendChild(createButton(tag, () => {
 					const recorder = CanvasRecorder.create(app.view);
-					recorder.start();
-					setTimeout(() => {
-						recorder.finishAsync()
-							.then(movie => {
-								movie.download(tag);
-							});
-					}, 2000);
+					record(recorder, tag, 2000);
 				}));
 			}
 			
@@ -60,13 +66,7 @@
 				document.body.appendChild(createButton(tag, () => {
 					CanvasRecorder.createWithAudioAsync(app.view)
 						.then(recorder => {
-							recorder.start();
-							setTimeout(() => {
-								recorder.finishAsync()
-									.then(movie => {
-										movie.download(tag);
-									});
-							}, 2000);
+							record(recorder, tag, 2000);
 						});
 				}));
 			}
@@ -76,13 +76,7 @@
 				document.body.appendChild(createButton(tag, () => {
 					CanvasRecorder.createWithAudioAsync(app.view, { user: true })
 						.then(recorder => {
-							recorder.start();
-							setTimeout(() => {
-								recorder.finishAsync()
-									.then(movie => {
-										movie.download(tag);
-									});
-							}, 2000);
+							record(recorder, tag, 2000);
 						});
 				}));
 			}
@@ -92,13 +86,7 @@
 				document.body.appendChild(createButton(tag, () => {
 					CanvasRecorder.createWithAudioAsync(app.view, { user: true, display: true  })
 						.then(recorder => {
-							recorder.start();
-							setTimeout(() => {
-								recorder.finishAsync()
-									.then(movie => {
-										movie.download(tag);
-									});
-							}, 2000);
+							record(recorder, tag, 2000);
 						});
 				}));
 			}
@@ -114,14 +102,7 @@
 						.then(audioStream => audioStream.getAudioTracks().forEach(track => stream.addTrack(track)))
 						.then(() => {
 							const recorder = new CanvasRecorder(stream);
-							recorder.start();
-							
-							setTimeout(() => {
-								recorder.finishAsync()
-									.then(movie => {
-										movie.download(tag);
-									});
-							}, 2000);
+							record(recorder, tag, 2000);
 						});
 				}));
 			}

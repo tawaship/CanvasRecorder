@@ -1,8 +1,9 @@
 {
   "name": "@tawaship/canvas-recorder",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Save the canvas on the web page as a video.",
+  "main": "dist/CanvasRecorder.cjs.js",
+  "module": "dist/CanvasRecorder.esm.js",
   "scripts": {
     "rollup": "rollup -c rollup.config.js",
     "d": "tsc --target ES5 --emitDeclarationOnly --downlevelIteration --outDir types/ --declaration",
@@ -10,11 +11,20 @@
     "watch": "npm run rollup -- -w",
     "build": "node del.js && npm run rollup && npm run docs && npm run d && echo done."
   },
+  "keywords": [
+    "html5",
+    "audio",
+    "video",
+    "MediaStream",
+    "canvas",
+    "getDisplayMedia",
+    "getUserMedia"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tawaship/CanvasRecorder.git"
   },
-  "author": "tawaship",
+  "author": "tawaship (makazu.mori@gmail.com)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/tawaship/CanvasRecorder/issues"

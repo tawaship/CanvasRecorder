@@ -153,6 +153,7 @@ class Emitter {
     }
 }
 
+var _a, _b;
 /**
  * @private
  */
@@ -182,12 +183,26 @@ class Movie {
         anchor.href = this._blobURL;
         anchor.click();
     }
+    get blobURL() {
+        if (!this._blobURL) {
+            throw new Error('[CanvasRecorder] This movie instance was destroyed.');
+        }
+        return this._blobURL;
+    }
     destroy() {
         window.URL.revokeObjectURL(this._blobURL);
         this._blobURL = null;
     }
 }
 /**
+ * @ignore
+ */
+const DisplayStream = Symbol();
+/**
+ * @ignore
+ */
+const UserStream = Symbol();
+/*
  * This API reference does not contain information for the parent class "MediaRecorder".<br />
  * For more information on "MediaRecorder", please refer to the following URL.<br />
  * [[https://developer.mozilla.org/en/docs/Web/API/MediaRecorder]]
@@ -201,6 +216,8 @@ class CanvasRecorder {
         this._buildPromise = null;
         this._buildEmitter = new Emitter();
         this._movie = null;
+        this[_a] = null;
+        this[_b] = null;
         let blobList = [];
         this._recorder = new MediaRecorder(stream, recordOptions);
         this._recorder.addEventListener('dataavailable', e => {
@@ -219,10 +236,7 @@ class CanvasRecorder {
         if (this._recorder.state !== 'inactive') {
             return;
         }
-        if (this._movie) {
-            this._movie.destroy();
-            this._movie = null;
-        }
+        this.clearMovie();
         this._buildPromise = new Promise(resolve => {
             this._buildEmitter.once('finish', blobList => {
                 const movieBlob = new Blob(blobList, { type: blobList[0].type });
@@ -260,11 +274,36 @@ class CanvasRecorder {
         }
         this._recorder.resume();
     }
-    destroy() {
+    clearMovie() {
         if (this._movie) {
             this._movie.destroy();
             this._movie = null;
         }
+    }
+    destroy() {
+        this.clearMovie();
+        this._recorder.stream.getTracks().forEach(track => track.stop());
+        this._releaseDisplayStream();
+        this._releaseUserStream();
+    }
+    _releaseDisplayStream() {
+        if (this[DisplayStream]) {
+            this[DisplayStream].getTracks().forEach(track => track.stop());
+        }
+    }
+    _releaseUserStream() {
+        if (this[UserStream]) {
+            this[UserStream].getTracks().forEach(track => track.stop());
+        }
+    }
+    disabled(flag) {
+        this._recorder.stream.getTracks().forEach(track => track.enabled = !flag);
+    }
+    hide(flag) {
+        this._recorder.stream.getVideoTracks().forEach(track => track.enabled = !flag);
+    }
+    mute(flag) {
+        this._recorder.stream.getAudioTracks().forEach(track => track.enabled = !flag);
     }
     addAudioAsync(audioOptions = { display: true }) {
         const streams = [];
@@ -276,16 +315,14 @@ class CanvasRecorder {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
                 return Promise.reject();
             }
+            this._releaseDisplayStream();
             const displayTrackConstraints = audioOptions.display === true ? defaultUserAudioTrackConstraints : audioOptions.display;
             return navigator.mediaDevices.getDisplayMedia({ audio: displayTrackConstraints, video: true })
-                .then(displayStream => streams.push(displayStream));
-            /*
-            .then(displayStream => {
-                displayStream.getAudioTracks().forEach(track => {
-                    this._recorder.stream.addTrack(track);
-                });
+                .then(stream => {
+                this[DisplayStream] = stream;
+                stream.getVideoTracks().forEach(track => track.stop());
+                streams.push(stream);
             });
-            */
         })
             .catch(e => {
             console.warn('[CanvasRecorder] Can not use display media.');
@@ -297,16 +334,14 @@ class CanvasRecorder {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 return Promise.reject();
             }
+            this._releaseUserStream();
             const userTrackConstraints = audioOptions.user === true ? defaultUserAudioTrackConstraints : audioOptions.user;
             return navigator.mediaDevices.getUserMedia({ audio: userTrackConstraints })
-                .then(userStream => streams.push(userStream));
-            /*
-            .then(userStream => {
-                userStream.getAudioTracks().forEach(track => {
-                    this._recorder.stream.addTrack(track);
-                });
+                .then(stream => {
+                this[UserStream] = stream;
+                stream.getVideoTracks().forEach(track => track.stop());
+                streams.push(stream);
             });
-            */
         })
             .catch(e => {
             console.warn('[CanvasRecorder] Can not use user media.');
@@ -344,6 +379,7 @@ class CanvasRecorder {
             .then(() => recorder);
     }
 }
+_a = DisplayStream, _b = UserStream;
 
 export { CanvasRecorder };
 //# sourceMappingURL=CanvasRecorder.esm.js.map

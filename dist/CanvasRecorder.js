@@ -11,7 +11,7 @@ var CanvasRecorder = function() {
      * 
      * @author tawaship (makazu.mori@gmail.com)
      * @license MIT
-     */    var Emitter = function() {
+     */    var _a, _b, Emitter = function() {
         this._events = {};
     }, prototypeAccessors = {
         eventNames: {
@@ -85,6 +85,10 @@ var CanvasRecorder = function() {
         channelCount: 2
     }, Movie = function(blob) {
         this._blobURL = window.URL.createObjectURL(blob);
+    }, prototypeAccessors$1 = {
+        blobURL: {
+            configurable: !0
+        }
     };
     Movie.prototype.createVideoElement = function() {
         if (!this._blobURL) {
@@ -99,13 +103,18 @@ var CanvasRecorder = function() {
         var anchor = document.createElement("a");
         anchor.download = filename ? filename + ".webm" : location.hostname + "_" + (new Date).toLocaleString().replace(/[\/\s\:]/g, "-") + ".webm", 
         anchor.href = this._blobURL, anchor.click();
+    }, prototypeAccessors$1.blobURL.get = function() {
+        if (!this._blobURL) {
+            throw new Error("[CanvasRecorder] This movie instance was destroyed.");
+        }
+        return this._blobURL;
     }, Movie.prototype.destroy = function() {
         window.URL.revokeObjectURL(this._blobURL), this._blobURL = null;
-    };
-    var CanvasRecorder = function(stream, recordOptions) {
+    }, Object.defineProperties(Movie.prototype, prototypeAccessors$1);
+    var DisplayStream = Symbol(), UserStream = Symbol(), CanvasRecorder = function(stream, recordOptions) {
         var this$1 = this;
         void 0 === recordOptions && (recordOptions = {}), this._buildPromise = null, this._buildEmitter = new Emitter, 
-        this._movie = null;
+        this._movie = null, this[_a] = null, this[_b] = null;
         var blobList = [];
         this._recorder = new MediaRecorder(stream, recordOptions), this._recorder.addEventListener("dataavailable", (function(e) {
             blobList.push(e.data);
@@ -115,8 +124,7 @@ var CanvasRecorder = function() {
     };
     return CanvasRecorder.prototype.start = function(timeslice) {
         var this$1 = this;
-        "inactive" === this._recorder.state && (this._movie && (this._movie.destroy(), this._movie = null), 
-        this._buildPromise = new Promise((function(resolve) {
+        "inactive" === this._recorder.state && (this.clearMovie(), this._buildPromise = new Promise((function(resolve) {
             this$1._buildEmitter.once("finish", (function(blobList) {
                 var movieBlob = new Blob(blobList, {
                     type: blobList[0].type
@@ -130,8 +138,32 @@ var CanvasRecorder = function() {
         "recording" === this._recorder.state && this._recorder.pause();
     }, CanvasRecorder.prototype.resume = function() {
         "paused" === this._recorder.state && this._recorder.resume();
-    }, CanvasRecorder.prototype.destroy = function() {
+    }, CanvasRecorder.prototype.clearMovie = function() {
         this._movie && (this._movie.destroy(), this._movie = null);
+    }, CanvasRecorder.prototype.destroy = function() {
+        this.clearMovie(), this._recorder.stream.getTracks().forEach((function(track) {
+            return track.stop();
+        })), this._releaseDisplayStream(), this._releaseUserStream();
+    }, CanvasRecorder.prototype._releaseDisplayStream = function() {
+        this[DisplayStream] && this[DisplayStream].getTracks().forEach((function(track) {
+            return track.stop();
+        }));
+    }, CanvasRecorder.prototype._releaseUserStream = function() {
+        this[UserStream] && this[UserStream].getTracks().forEach((function(track) {
+            return track.stop();
+        }));
+    }, CanvasRecorder.prototype.disabled = function(flag) {
+        this._recorder.stream.getTracks().forEach((function(track) {
+            return track.enabled = !flag;
+        }));
+    }, CanvasRecorder.prototype.hide = function(flag) {
+        this._recorder.stream.getVideoTracks().forEach((function(track) {
+            return track.enabled = !flag;
+        }));
+    }, CanvasRecorder.prototype.mute = function(flag) {
+        this._recorder.stream.getAudioTracks().forEach((function(track) {
+            return track.enabled = !flag;
+        }));
     }, CanvasRecorder.prototype.addAudioAsync = function(audioOptions) {
         var this$1 = this;
         void 0 === audioOptions && (audioOptions = {
@@ -145,12 +177,15 @@ var CanvasRecorder = function() {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
                 return Promise.reject();
             }
+            this$1._releaseDisplayStream();
             var displayTrackConstraints = !0 === audioOptions.display ? defaultUserAudioTrackConstraints : audioOptions.display;
             return navigator.mediaDevices.getDisplayMedia({
                 audio: displayTrackConstraints,
                 video: !0
-            }).then((function(displayStream) {
-                return streams.push(displayStream);
+            }).then((function(stream) {
+                this$1[DisplayStream] = stream, stream.getVideoTracks().forEach((function(track) {
+                    return track.stop();
+                })), streams.push(stream);
             }));
         })).catch((function(e) {
             console.warn("[CanvasRecorder] Can not use display media.");
@@ -161,11 +196,14 @@ var CanvasRecorder = function() {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 return Promise.reject();
             }
+            this$1._releaseUserStream();
             var userTrackConstraints = !0 === audioOptions.user ? defaultUserAudioTrackConstraints : audioOptions.user;
             return navigator.mediaDevices.getUserMedia({
                 audio: userTrackConstraints
-            }).then((function(userStream) {
-                return streams.push(userStream);
+            }).then((function(stream) {
+                this$1[UserStream] = stream, stream.getVideoTracks().forEach((function(track) {
+                    return track.stop();
+                })), streams.push(stream);
             }));
         })).catch((function(e) {
             console.warn("[CanvasRecorder] Can not use user media.");
@@ -197,6 +235,6 @@ var CanvasRecorder = function() {
         return recorder.addAudioAsync(audioOptions).then((function() {
             return recorder;
         }));
-    }, CanvasRecorder;
+    }, _a = DisplayStream, _b = UserStream, CanvasRecorder;
 }();
 //# sourceMappingURL=CanvasRecorder.js.map

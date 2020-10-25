@@ -5,14 +5,17 @@ const buble = require('@rollup/plugin-buble');
 const { terser } = require('rollup-plugin-terser');
 
 const conf = require('./package.json');
+const name = conf.name;
 const version = conf.version;
+const author = conf.author;
+const license = conf.license;
 
 const banner = [
 	'/*!',
-	` * @tawaship/canvas-recorder - v${version}`,
+	` * ${name} - v${version}`,
 	' * ',
-	' * @author tawaship (makazu.mori@gmail.com)',
-	' * @license MIT',
+	` * @author ${author}`,
+	` * @license ${license}`,
 	' */',
 	''
 ].join('\n');

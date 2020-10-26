@@ -64,6 +64,58 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
+				<a href="#canvasrecorder" id="canvasrecorder" style="color: inherit; text-decoration: none;">
+					<h1>CanvasRecorder</h1>
+				</a>
+				<p>Save the canvas on the web page as a video.</p>
+				<p><a href="LICENSE"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat" alt="MIT License"></a></p>
+				<hr>
+				<a href="#install" id="install" style="color: inherit; text-decoration: none;">
+					<h2>Install</h2>
+				</a>
+				<a href="#in-the-browser" id="in-the-browser" style="color: inherit; text-decoration: none;">
+					<h3>In the browser</h3>
+				</a>
+				<pre><code class="language-sh">git <span class="hljs-built_in">clone</span> https://github.com/tawaship/CanvasRecorder.git</code></pre>
+				<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/path/to/dist/CanvasRecorder.min.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
+				<a href="#npm" id="npm" style="color: inherit; text-decoration: none;">
+					<h3>NPM</h3>
+				</a>
+				<pre><code class="language-sh">npm install --save @tawaship/canvas-recorder</code></pre>
+				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { CanvasRecorder } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@tawaship/canvas-recorder&#x27;</span>;</code></pre>
+				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { CanvasRecorder } = rquire(<span class="hljs-string">&#x27;@tawaship/canvas-recorder&#x27;</span>);</code></pre>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h2>Usage</h2>
+				</a>
+				<a href="#only-canvas" id="only-canvas" style="color: inherit; text-decoration: none;">
+					<h3>Only canvas</h3>
+				</a>
+				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> canvas = <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">&quot;canvas&quot;</span>)[<span class="hljs-number">0</span>]; <span class="hljs-comment">// Canvas you want to record.</span>
+<span class="hljs-keyword">const</span> recorder = CanvasRecorder.create(canvas);
+recorder.start();
+<span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">()=&gt;</span> {
+    recorder.finishAsync()
+        .then(<span class="hljs-function"><span class="hljs-params">movie</span> =&gt;</span> {
+            movie.download();
+        });
+}, <span class="hljs-number">2000</span>);</code></pre>
+				<a href="#with-audio" id="with-audio" style="color: inherit; text-decoration: none;">
+					<h3>With audio</h3>
+				</a>
+				<p><strong><span style="color: red;">note:</span></strong><br><strong>When including the audio being played on the screen in the video, due to technical restrictions, we are executing <code>navigator.mediaDevices.getDisplayMedia()</code> to share the screen.</strong></p>
+				<p><strong>Only the audio is extracted without capturing the screen, and the screen sharing is canceled as soon as the recording ends.</strong></p>
+				<p><strong>Be very careful when using it, or do not run it if you are unreliable.</strong></p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> canvas = <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">&quot;canvas&quot;</span>)[<span class="hljs-number">0</span>]; <span class="hljs-comment">// Canvas you want to record.</span>
+CanvasRecorder.createWithAudioAsync(canvas)
+    .then(<span class="hljs-function"><span class="hljs-params">recorder</span> =&gt;</span> {
+        recorder.start();
+        <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">()=&gt;</span> {
+            recorder.finishAsync()
+                .then(<span class="hljs-function"><span class="hljs-params">movie</span> =&gt;</span> {
+                    movie.download();
+                });
+        }, <span class="hljs-number">2000</span>);
+    });</code></pre>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">

@@ -188,7 +188,7 @@ var CanvasRecorder = function() {
                 })), streams.push(stream);
             }));
         })).catch((function(e) {
-            console.warn("[CanvasRecorder] Can not use display media.");
+            console.error(e), console.warn("[CanvasRecorder] Can not use display media.");
         })).then((function() {
             if (!audioOptions.user) {
                 return Promise.resolve();
@@ -206,20 +206,30 @@ var CanvasRecorder = function() {
                 })), streams.push(stream);
             }));
         })).catch((function(e) {
-            console.warn("[CanvasRecorder] Can not use user media.");
+            console.error(e), console.warn("[CanvasRecorder] Can not use user media.");
         })).then((function() {
-            if (!AudioContext) {
-                return console.warn('[CanvasRecorder] Priority is given to "display media" as multiple audio tracks cannot be used.'), 
-                void streams.forEach((function(stream) {
-                    return stream.getAudioTracks().forEach((function(track) {
-                        return this$1._recorder.stream.addTrack(track);
-                    }));
-                }));
+            if (streams.length) {
+                if (streams.reduce((function(total, stream) {
+                    return total + stream.getAudioTracks().length;
+                }), 0)) {
+                    if (!AudioContext) {
+                        return console.warn('[CanvasRecorder] Priority is given to "display media" as multiple audio tracks cannot be used.'), 
+                        void streams.forEach((function(stream) {
+                            return stream.getAudioTracks().forEach((function(track) {
+                                return this$1._recorder.stream.addTrack(track);
+                            }));
+                        }));
+                    }
+                    var audioContext = new AudioContext, destination = audioContext.createMediaStreamDestination();
+                    streams.forEach((function(stream) {
+                        return audioContext.createMediaStreamSource(stream).connect(destination);
+                    })), this$1._recorder.stream.addTrack(destination.stream.getAudioTracks()[0]);
+                } else {
+                    console.warn("[CanvasRecorder] No audio stream.");
+                }
+            } else {
+                console.warn("[CanvasRecorder] No audio stream.");
             }
-            var audioContext = new AudioContext, destination = audioContext.createMediaStreamDestination();
-            streams.forEach((function(stream) {
-                return audioContext.createMediaStreamSource(stream).connect(destination);
-            })), this$1._recorder.stream.addTrack(destination.stream.getAudioTracks()[0]);
         }));
     }, CanvasRecorder.create = function(canvas, recordOptions) {
         void 0 === recordOptions && (recordOptions = {});

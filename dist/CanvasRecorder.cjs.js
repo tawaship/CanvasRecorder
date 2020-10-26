@@ -329,6 +329,7 @@ class CanvasRecorder {
             });
         })
             .catch(e => {
+            console.error(e);
             console.warn('[CanvasRecorder] Can not use display media.');
         })
             .then(() => {
@@ -348,9 +349,21 @@ class CanvasRecorder {
             });
         })
             .catch(e => {
+            console.error(e);
             console.warn('[CanvasRecorder] Can not use user media.');
         })
             .then(() => {
+            if (!streams.length) {
+                console.warn('[CanvasRecorder] No audio stream.');
+                return;
+            }
+            const audioTrackNum = streams.reduce((total, stream) => {
+                return total + stream.getAudioTracks().length;
+            }, 0);
+            if (!audioTrackNum) {
+                console.warn('[CanvasRecorder] No audio stream.');
+                return;
+            }
             if (!AudioContext) {
                 console.warn('[CanvasRecorder] Priority is given to "display media" as multiple audio tracks cannot be used.');
                 streams.forEach(stream => stream.getAudioTracks().forEach(track => this._recorder.stream.addTrack(track)));

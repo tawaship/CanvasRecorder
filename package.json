@@ -10,7 +10,7 @@
     "docs": "typedoc --tsconfig tsconfig.json",
     "watch": "npm run rollup -- -w",
     "test-browser": "npm run test -- --debug",
-    "test": "ENV ELECTRON_DISABLE_SECURITY_WARNINGS=1 floss --path test/ --reporter=tap",
+    "test": "floss --path test/ --reporter=tap",
     "build": "node del.js && npm run rollup && npm run docs && npm run d && echo done."
   },
   "keywords": [

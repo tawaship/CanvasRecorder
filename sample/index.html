@@ -62,8 +62,10 @@
 			{
 				const tag = 'create';
 				document.body.appendChild(createButton(tag, () => {
-					const recorder = CanvasRecorder.create(app.view);
-					record(recorder, tag, 2000);
+					CanvasRecorder.createAsync(app.view)
+						.then(recorder => {
+							record(recorder, tag, 2000);
+						});
 				}));
 			}
 			
@@ -98,7 +100,7 @@
 			}
 			
 			{
-				const tag = 'create from stream';
+				const tag = 'create from streams';
 				
 				document.body.appendChild(createButton(tag, () => {
 					const stream = new MediaStream();

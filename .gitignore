@@ -1,4 +1,2 @@
-testgame/
-\!*
 node_modules/
-types/
+.npmignore

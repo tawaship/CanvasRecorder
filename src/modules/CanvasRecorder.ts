@@ -38,9 +38,6 @@ export interface AudioOptions {
 	display?: boolean | MediaTrackConstraints;
 }
 
-interface A {
-	a:number;
-}
 /**
  * @private
  */
@@ -66,6 +63,9 @@ class Movie {
 		this._blobURL = window.URL.createObjectURL(blob);
 	}
 	
+	/**
+	 * [[https://developer.mozilla.org/en/docs/Web/API/HTMLVideoElement]]
+	 */
 	createVideoElement() {
 		if (!this._blobURL) {
 			throw new Error('[CanvasRecorder] This movie instance was destroyed.');
@@ -74,6 +74,7 @@ class Movie {
 		const video = document.createElement('video');
 		video.src = this._blobURL;
 		video.setAttribute('controls', '');
+		
 		return video;
 	}
 	
@@ -331,14 +332,14 @@ export class CanvasRecorder {
 	 * @param canvas [[https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement]]
 	 * @param recordOptions [[https://developer.mozilla.org/en/docs/Web/API/MediaRecorder/MediaRecorder#Syntax]]
 	 */
-	static create(canvas: HTMLCanvasElement, recordOptions: MediaRecordOptions = {}) {
+	static createAsync(canvas: HTMLCanvasElement, recordOptions: MediaRecordOptions = {}) {
 		const stream = new MediaStream();
 		
 		canvas.captureStream().getVideoTracks().forEach(track => {
 			stream.addTrack(track);
 		});
 		
-		return new CanvasRecorder(stream, recordOptions);
+		return Promise.resolve(new CanvasRecorder(stream, recordOptions));
 	}
 	
 	/**
@@ -346,9 +347,10 @@ export class CanvasRecorder {
 	 * @param recordOptions [[https://developer.mozilla.org/en/docs/Web/API/MediaRecorder/MediaRecorder#Syntax]]
 	 */
 	static createWithAudioAsync(canvas: HTMLCanvasElement, audioOptions: AudioOptions = { display: true }, recordOptions: MediaRecordOptions = {}) {
-		const recorder = CanvasRecorder.create(canvas, recordOptions);
-		
-		return recorder.addAudioAsync(audioOptions)
-			.then(() => recorder);
+		return CanvasRecorder.createAsync(canvas, recordOptions)
+			.then(recorder => {
+				return recorder.addAudioAsync(audioOptions)
+					.then(() => recorder);
+			});
 	}
 }

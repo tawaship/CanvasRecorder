@@ -165,6 +165,9 @@ class Movie {
     constructor(blob) {
         this._blobURL = window.URL.createObjectURL(blob);
     }
+    /**
+     * [[https://developer.mozilla.org/en/docs/Web/API/HTMLVideoElement]]
+     */
     createVideoElement() {
         if (!this._blobURL) {
             throw new Error('[CanvasRecorder] This movie instance was destroyed.');
@@ -375,21 +378,23 @@ class CanvasRecorder {
      * @param canvas [[https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement]]
      * @param recordOptions [[https://developer.mozilla.org/en/docs/Web/API/MediaRecorder/MediaRecorder#Syntax]]
      */
-    static create(canvas, recordOptions = {}) {
+    static createAsync(canvas, recordOptions = {}) {
         const stream = new MediaStream();
         canvas.captureStream().getVideoTracks().forEach(track => {
             stream.addTrack(track);
         });
-        return new CanvasRecorder(stream, recordOptions);
+        return Promise.resolve(new CanvasRecorder(stream, recordOptions));
     }
     /**
      * @param canvas [[https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement]]
      * @param recordOptions [[https://developer.mozilla.org/en/docs/Web/API/MediaRecorder/MediaRecorder#Syntax]]
      */
     static createWithAudioAsync(canvas, audioOptions = { display: true }, recordOptions = {}) {
-        const recorder = CanvasRecorder.create(canvas, recordOptions);
-        return recorder.addAudioAsync(audioOptions)
-            .then(() => recorder);
+        return CanvasRecorder.createAsync(canvas, recordOptions)
+            .then(recorder => {
+            return recorder.addAudioAsync(audioOptions)
+                .then(() => recorder);
+        });
     }
 }
 _a = DisplayStream, _b = UserStream;

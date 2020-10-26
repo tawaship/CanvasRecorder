@@ -77,13 +77,15 @@
 					<h3>In the browser</h3>
 				</a>
 				<pre><code class="language-sh">git <span class="hljs-built_in">clone</span> https://github.com/tawaship/CanvasRecorder.git</code></pre>
+				<br />
 				<pre><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;/path/to/dist/CanvasRecorder.min.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span></code></pre>
 				<a href="#npm" id="npm" style="color: inherit; text-decoration: none;">
 					<h3>NPM</h3>
 				</a>
 				<pre><code class="language-sh">npm install --save @tawaship/canvas-recorder</code></pre>
-				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { CanvasRecorder } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@tawaship/canvas-recorder&#x27;</span>;</code></pre>
-				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { CanvasRecorder } = rquire(<span class="hljs-string">&#x27;@tawaship/canvas-recorder&#x27;</span>);</code></pre>
+				<br />
+				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> { CanvasRecorder } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@tawaship/canvas-recorder&#x27;</span>;
+<span class="hljs-keyword">const</span> { CanvasRecorder } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;@tawaship/canvas-recorder&#x27;</span>);</code></pre>
 				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
 					<h2>Usage</h2>
 				</a>
@@ -91,14 +93,16 @@
 					<h3>Only canvas</h3>
 				</a>
 				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> canvas = <span class="hljs-built_in">document</span>.getElementsByTagName(<span class="hljs-string">&quot;canvas&quot;</span>)[<span class="hljs-number">0</span>]; <span class="hljs-comment">// Canvas you want to record.</span>
-<span class="hljs-keyword">const</span> recorder = CanvasRecorder.create(canvas);
-recorder.start();
-<span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">()=&gt;</span> {
-    recorder.finishAsync()
-        .then(<span class="hljs-function"><span class="hljs-params">movie</span> =&gt;</span> {
-            movie.download();
-        });
-}, <span class="hljs-number">2000</span>);</code></pre>
+CanvasRecorder.createAsync(canvas)
+    .then(<span class="hljs-function"><span class="hljs-params">recorder</span> =&gt;</span> {
+        recorder.start();
+        <span class="hljs-built_in">setTimeout</span>(<span class="hljs-function">()=&gt;</span> {
+            recorder.finishAsync()
+                .then(<span class="hljs-function"><span class="hljs-params">movie</span> =&gt;</span> {
+                    movie.download();
+                });
+        }, <span class="hljs-number">2000</span>);
+    });</code></pre>
 				<a href="#with-audio" id="with-audio" style="color: inherit; text-decoration: none;">
 					<h3>With audio</h3>
 				</a>
@@ -133,9 +137,6 @@ CanvasRecorder.createWithAudioAsync(canvas)
 					</li>
 					<li class=" tsd-kind-class tsd-is-private">
 						<a href="classes/movie.html" class="tsd-kind-icon">Movie</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/a.html" class="tsd-kind-icon">A</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/audiooptions.html" class="tsd-kind-icon">Audio<wbr>Options</a>

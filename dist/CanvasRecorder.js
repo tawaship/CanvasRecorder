@@ -231,19 +231,19 @@ var CanvasRecorder = function() {
                 console.warn("[CanvasRecorder] No audio stream.");
             }
         }));
-    }, CanvasRecorder.create = function(canvas, recordOptions) {
+    }, CanvasRecorder.createAsync = function(canvas, recordOptions) {
         void 0 === recordOptions && (recordOptions = {});
         var stream = new MediaStream;
         return canvas.captureStream().getVideoTracks().forEach((function(track) {
             stream.addTrack(track);
-        })), new CanvasRecorder(stream, recordOptions);
+        })), Promise.resolve(new CanvasRecorder(stream, recordOptions));
     }, CanvasRecorder.createWithAudioAsync = function(canvas, audioOptions, recordOptions) {
-        void 0 === audioOptions && (audioOptions = {
+        return void 0 === audioOptions && (audioOptions = {
             display: !0
-        }), void 0 === recordOptions && (recordOptions = {});
-        var recorder = CanvasRecorder.create(canvas, recordOptions);
-        return recorder.addAudioAsync(audioOptions).then((function() {
-            return recorder;
+        }), void 0 === recordOptions && (recordOptions = {}), CanvasRecorder.createAsync(canvas, recordOptions).then((function(recorder) {
+            return recorder.addAudioAsync(audioOptions).then((function() {
+                return recorder;
+            }));
         }));
     }, _a = DisplayStream, _b = UserStream, CanvasRecorder;
 }();

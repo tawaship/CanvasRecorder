@@ -16,6 +16,8 @@ Save the canvas on the web page as a video.
 git clone https://github.com/tawaship/CanvasRecorder.git
 ```
 
+<br />
+
 ```html
 <script src="/path/to/dist/CanvasRecorder.min.js"></script>
 ```
@@ -26,12 +28,11 @@ git clone https://github.com/tawaship/CanvasRecorder.git
 npm install --save @tawaship/canvas-recorder
 ```
 
-```javascript
-import { CanvasRecorder } from '@tawaship/canvas-recorder';
-```
+<br />
 
 ```javascript
-const { CanvasRecorder } = rquire('@tawaship/canvas-recorder');
+import { CanvasRecorder } from '@tawaship/canvas-recorder';
+const { CanvasRecorder } = require('@tawaship/canvas-recorder');
 ```
 
 ## Usage
@@ -40,14 +41,16 @@ const { CanvasRecorder } = rquire('@tawaship/canvas-recorder');
 
 ```javascript
 const canvas = document.getElementsByTagName("canvas")[0]; // Canvas you want to record.
-const recorder = CanvasRecorder.create(canvas);
-recorder.start();
-setTimeout(()=> {
-	recorder.finishAsync()
-		.then(movie => {
-			movie.download();
-		});
-}, 2000);
+CanvasRecorder.createAsync(canvas)
+	.then(recorder => {
+		recorder.start();
+		setTimeout(()=> {
+			recorder.finishAsync()
+				.then(movie => {
+					movie.download();
+				});
+		}, 2000);
+	});
 ```
 
 ### With audio

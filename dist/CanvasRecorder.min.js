@@ -1,5 +1,5 @@
 /*!
- * @tawaship/canvas-recorder - v1.0.0
+ * @tawaship/canvas-recorder - v1.0.1
  * 
  * @author tawaship (makazu.mori@gmail.com)
  * @license MIT

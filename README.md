@@ -2,6 +2,7 @@
 
 Save the canvas on the web page as a video.
 
+[![Build Status](https://travis-ci.org/tawaship/CanvasRecorder.svg?branch=master)](https://travis-ci.org/tawaship/CanvasRecorder)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
 ---

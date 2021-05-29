@@ -1,5 +1,5 @@
 /*!
- * @tawaship/canvas-recorder - v1.0.1
+ * @tawaship/canvas-recorder - v1.1.0
  * 
  * @author tawaship (makazu.mori@gmail.com)
  * @license MIT
@@ -380,21 +380,26 @@ class CanvasRecorder {
     }
     /**
      * @param canvas [[https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement]]
-     * @param recordOptions [[https://developer.mozilla.org/en/docs/Web/API/MediaRecorder/MediaRecorder#Syntax]]
+     * @param factoryOptions
      */
-    static createAsync(canvas, recordOptions = {}) {
+    static createAsync(canvas, factoryOptions) {
+        factoryOptions = factoryOptions || {};
+        const framerate = factoryOptions.framerate || 60;
+        const recordOptions = factoryOptions.recordOptions || {};
         const stream = new MediaStream();
-        canvas.captureStream().getVideoTracks().forEach(track => {
+        canvas.captureStream(framerate).getVideoTracks().forEach(track => {
             stream.addTrack(track);
         });
         return Promise.resolve(new CanvasRecorder(stream, recordOptions));
     }
     /**
      * @param canvas [[https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement]]
-     * @param recordOptions [[https://developer.mozilla.org/en/docs/Web/API/MediaRecorder/MediaRecorder#Syntax]]
+     * @param factoryOptions
      */
-    static createWithAudioAsync(canvas, audioOptions = { display: true }, recordOptions = {}) {
-        return CanvasRecorder.createAsync(canvas, recordOptions)
+    static createWithAudioAsync(canvas, factoryOptions) {
+        factoryOptions = factoryOptions || {};
+        const audioOptions = factoryOptions.audioOptions || { display: true };
+        return CanvasRecorder.createAsync(canvas, factoryOptions)
             .then(recorder => {
             return recorder.addAudioAsync(audioOptions)
                 .then(() => recorder);

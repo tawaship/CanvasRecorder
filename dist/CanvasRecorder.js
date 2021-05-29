@@ -1,5 +1,5 @@
 /*!
- * @tawaship/canvas-recorder - v1.0.1
+ * @tawaship/canvas-recorder - v1.1.0
  * 
  * @author tawaship (makazu.mori@gmail.com)
  * @license MIT
@@ -231,16 +231,16 @@ var CanvasRecorder = function() {
                 console.warn("[CanvasRecorder] No audio stream.");
             }
         }));
-    }, CanvasRecorder.createAsync = function(canvas, recordOptions) {
-        void 0 === recordOptions && (recordOptions = {});
-        var stream = new MediaStream;
-        return canvas.captureStream().getVideoTracks().forEach((function(track) {
+    }, CanvasRecorder.createAsync = function(canvas, factoryOptions) {
+        var framerate = (factoryOptions = factoryOptions || {}).framerate || 60, recordOptions = factoryOptions.recordOptions || {}, stream = new MediaStream;
+        return canvas.captureStream(framerate).getVideoTracks().forEach((function(track) {
             stream.addTrack(track);
         })), Promise.resolve(new CanvasRecorder(stream, recordOptions));
-    }, CanvasRecorder.createWithAudioAsync = function(canvas, audioOptions, recordOptions) {
-        return void 0 === audioOptions && (audioOptions = {
+    }, CanvasRecorder.createWithAudioAsync = function(canvas, factoryOptions) {
+        var audioOptions = (factoryOptions = factoryOptions || {}).audioOptions || {
             display: !0
-        }), void 0 === recordOptions && (recordOptions = {}), CanvasRecorder.createAsync(canvas, recordOptions).then((function(recorder) {
+        };
+        return CanvasRecorder.createAsync(canvas, factoryOptions).then((function(recorder) {
             return recorder.addAudioAsync(audioOptions).then((function() {
                 return recorder;
             }));

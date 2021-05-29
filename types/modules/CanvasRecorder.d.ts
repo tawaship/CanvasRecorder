@@ -18,6 +18,14 @@ export interface AudioOptions {
     user?: boolean | MediaTrackConstraints;
     display?: boolean | MediaTrackConstraints;
 }
+export interface FactoryOption {
+    framerate?: number;
+    audioOptions?: AudioOptions;
+    /**
+     * [[https://developer.mozilla.org/en/docs/Web/API/MediaRecorder/MediaRecorder#Syntax]]
+     */
+    recordOptions?: MediaRecordOptions;
+}
 /**
  * @private
  */
@@ -82,13 +90,13 @@ export declare class CanvasRecorder {
     addAudioAsync(audioOptions?: AudioOptions): Promise<void>;
     /**
      * @param canvas [[https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement]]
-     * @param recordOptions [[https://developer.mozilla.org/en/docs/Web/API/MediaRecorder/MediaRecorder#Syntax]]
+     * @param factoryOptions
      */
-    static createAsync(canvas: HTMLCanvasElement, recordOptions?: MediaRecordOptions): Promise<CanvasRecorder>;
+    static createAsync(canvas: HTMLCanvasElement, factoryOptions?: FactoryOption): Promise<CanvasRecorder>;
     /**
      * @param canvas [[https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement]]
-     * @param recordOptions [[https://developer.mozilla.org/en/docs/Web/API/MediaRecorder/MediaRecorder#Syntax]]
+     * @param factoryOptions
      */
-    static createWithAudioAsync(canvas: HTMLCanvasElement, audioOptions?: AudioOptions, recordOptions?: MediaRecordOptions): Promise<CanvasRecorder>;
+    static createWithAudioAsync(canvas: HTMLCanvasElement, factoryOptions?: FactoryOption): Promise<CanvasRecorder>;
 }
 export {};

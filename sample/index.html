@@ -82,7 +82,7 @@
 			{
 				const tag = 'create with user media';
 				document.body.appendChild(createButton(tag, () => {
-					CanvasRecorder.createWithAudioAsync(app.view, { user: true })
+					CanvasRecorder.createWithAudioAsync(app.view, { audioOptions: { user: true } })
 						.then(recorder => {
 							record(recorder, tag, 2000);
 						});
@@ -92,7 +92,7 @@
 			{
 				const tag = 'create with display and user media';
 				document.body.appendChild(createButton(tag, () => {
-					CanvasRecorder.createWithAudioAsync(app.view, { user: true, display: true  })
+					CanvasRecorder.createWithAudioAsync(app.view, { audioOptions: { user: true, display: true } })
 						.then(recorder => {
 							record(recorder, tag, 2000);
 						});
@@ -110,6 +110,16 @@
 						.then(audioStream => audioStream.getAudioTracks().forEach(track => stream.addTrack(track)))
 						.then(() => {
 							const recorder = new CanvasRecorder(stream);
+							record(recorder, tag, 2000);
+						});
+				}));
+			}
+			
+			{
+				const tag = 'create with framerate 5';
+				document.body.appendChild(createButton(tag, () => {
+					CanvasRecorder.createAsync(app.view, { framerate: 5 })
+						.then(recorder => {
 							record(recorder, tag, 2000);
 						});
 				}));

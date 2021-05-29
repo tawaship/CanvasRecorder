@@ -38,6 +38,15 @@ export interface AudioOptions {
 	display?: boolean | MediaTrackConstraints;
 }
 
+export interface FactoryOption {
+	framerate?: number;
+	audioOptions?: AudioOptions;
+	/**
+	 * [[https://developer.mozilla.org/en/docs/Web/API/MediaRecorder/MediaRecorder#Syntax]]
+	 */
+	recordOptions?: MediaRecordOptions;
+}
+
 /**
  * @private
  */
@@ -330,12 +339,17 @@ export class CanvasRecorder {
 	
 	/**
 	 * @param canvas [[https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement]]
-	 * @param recordOptions [[https://developer.mozilla.org/en/docs/Web/API/MediaRecorder/MediaRecorder#Syntax]]
+	 * @param factoryOptions
 	 */
-	static createAsync(canvas: HTMLCanvasElement, recordOptions: MediaRecordOptions = {}) {
+	static createAsync(canvas: HTMLCanvasElement, factoryOptions?: FactoryOption) {
+		factoryOptions = factoryOptions || {};
+		
+		const framerate = factoryOptions.framerate || 60;
+		const recordOptions = factoryOptions.recordOptions || {};
+		
 		const stream = new MediaStream();
 		
-		canvas.captureStream().getVideoTracks().forEach(track => {
+		canvas.captureStream(framerate).getVideoTracks().forEach(track => {
 			stream.addTrack(track);
 		});
 		
@@ -344,10 +358,14 @@ export class CanvasRecorder {
 	
 	/**
 	 * @param canvas [[https://developer.mozilla.org/en/docs/Web/API/HTMLCanvasElement]]
-	 * @param recordOptions [[https://developer.mozilla.org/en/docs/Web/API/MediaRecorder/MediaRecorder#Syntax]]
+	 * @param factoryOptions
 	 */
-	static createWithAudioAsync(canvas: HTMLCanvasElement, audioOptions: AudioOptions = { display: true }, recordOptions: MediaRecordOptions = {}) {
-		return CanvasRecorder.createAsync(canvas, recordOptions)
+	static createWithAudioAsync(canvas: HTMLCanvasElement, factoryOptions?: FactoryOption) {
+		factoryOptions = factoryOptions || {};
+		
+		const audioOptions = factoryOptions.audioOptions || { display: true };
+		
+		return CanvasRecorder.createAsync(canvas, factoryOptions)
 			.then(recorder => {
 				return recorder.addAudioAsync(audioOptions)
 					.then(() => recorder);

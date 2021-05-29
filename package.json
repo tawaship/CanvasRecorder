@@ -8,6 +8,8 @@
     "rollup": "rollup -c rollup.config.js",
     "d": "tsc --target ES5 --emitDeclarationOnly --downlevelIteration --outDir types/ --declaration",
     "docs": "typedoc --tsconfig tsconfig.json",
+    "test-browser": "npm run test -- --debug",
+    "test": "floss --path test/ --reporter=tap",
     "watch": "npm run rollup -- -w",
     "build": "node del.js && npm run rollup && npm run docs && npm run d && echo done."
   },

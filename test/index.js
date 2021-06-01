@@ -8,12 +8,11 @@ describe('CanvasRecorder', () => {
 		return CanvasRecorder.createAsync(canvas)
 			.then(recorder => {
 				recorder.start();
-				setTimeout(() => {
-					recorder.finishAsync()
-						.then(movie => {
-							recorder.destroy();
-						});
-				}, 1000);
+				
+				return recorder.finishAsync()
+					.then(movie => {
+						recorder.destroy();
+					});
 			});
 	});
 	
@@ -23,12 +22,13 @@ describe('CanvasRecorder', () => {
 		return CanvasRecorder.createWithAudioAsync(canvas)
 			.then(recorder => {
 				recorder.start();
-				setTimeout(() => {
-					recorder.finishAsync()
-						.then(movie => {
-							recorder.destroy();
-						});
-				}, 1000);
+				
+				recorder.start();
+				
+				return recorder.finishAsync()
+					.then(movie => {
+						recorder.destroy();
+					});
 			});
 	});
 	
@@ -37,11 +37,10 @@ describe('CanvasRecorder', () => {
 		
 		const recorder = new CanvasRecorder(canvas.captureStream())
 		recorder.start();
-		setTimeout(() => {
-			recorder.finishAsync()
-				.then(movie => {
-					recorder.destroy();
-				});
-		}, 1000);
+		
+		return recorder.finishAsync()
+			.then(movie => {
+				recorder.destroy();
+			});
 	});
 });

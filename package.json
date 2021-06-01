@@ -1,9 +1,10 @@
 {
   "name": "@tawaship/canvas-recorder",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Save the canvas on the web page as a video.",
   "main": "dist/CanvasRecorder.cjs.js",
   "module": "dist/CanvasRecorder.esm.js",
+  "types": "types/module.d.ts",
   "scripts": {
     "rollup": "rollup -c rollup.config.js",
     "d": "tsc --target ES5 --emitDeclarationOnly --downlevelIteration --outDir types/ --declaration",

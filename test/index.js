@@ -23,8 +23,6 @@ describe('CanvasRecorder', () => {
 			.then(recorder => {
 				recorder.start();
 				
-				recorder.start();
-				
 				return recorder.finishAsync()
 					.then(movie => {
 						recorder.destroy();
